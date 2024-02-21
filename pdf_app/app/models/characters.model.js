@@ -79,8 +79,8 @@ Character.getAllByRace = (race, result) => {
 
 Character.updateById = (id, character, result) => {
   sql.query(
-    "UPDATE characters SET title = ?, description = ?, published = ? WHERE id = ?",
-    [character.title, character.description, character.published, id],
+    "UPDATE characters SET name = ?, race = ?, class = ?, background = ?, strength = ?, dexterity = ?, intelligence = ?, wisdom = ?, charisma = ? WHERE id = ?",
+    [character.name, character.race, character.class, character.background, character.strength, character.dexterity, character.intelligence, character.wisdom, character.charisma, id],
     (err, res) => {
       if (err) {
         console.log("error: ", err);
