@@ -57,23 +57,10 @@ PDF_doc.getAll = (title, result) => {
   });
 };
 
-PDF_doc.getAllPublished = result => {
-  sql.query("SELECT * FROM generated_docs WHERE published=true", (err, res) => {
-    if (err) {
-      console.log("error: ", err);
-      result(null, err);
-      return;
-    }
-
-    console.log("tutorials: ", res);
-    result(null, res);
-  });
-};
-
-PDF_doc.updateById = (id, tutorial, result) => {
+PDF_doc.updateById = (id, pdf_doc, result) => {
   sql.query(
-    "UPDATE tutorials SET title = ?, description = ?, published = ? WHERE id = ?",
-    [tutorial.title, tutorial.description, tutorial.published, id],
+    "UPDATE generated_docs SET title = ?, content = ?, WHERE id = ?",
+    [pdf_doc.title, pdf_doc.content, id],
     (err, res) => {
       if (err) {
         console.log("error: ", err);
@@ -82,13 +69,13 @@ PDF_doc.updateById = (id, tutorial, result) => {
       }
 
       if (res.affectedRows == 0) {
-        // not found Tutorial with the id
+        // did not find doc with the id
         result({ kind: "not_found" }, null);
         return;
       }
 
-      console.log("updated tutorial: ", { id: id, ...tutorial });
-      result(null, { id: id, ...tutorial });
+      console.log("updated document: ", { id: id, ...pdf_doc });
+      result(null, { id: id, ...pdf_doc });
     }
   );
 };
@@ -102,12 +89,12 @@ PDF_doc.remove = (id, result) => {
     }
 
     if (res.affectedRows == 0) {
-      // not found Tutorial with the id
+      // did not find document with the id
       result({ kind: "not_found" }, null);
       return;
     }
 
-    console.log("deleted tutorial with id: ", id);
+    console.log("deleted document with id: ", id);
     result(null, res);
   });
 };
@@ -120,7 +107,7 @@ PDF_doc.removeAll = result => {
       return;
     }
 
-    console.log(`deleted ${res.affectedRows} tutorials`);
+    console.log(`deleted ${res.affectedRows} documents`);
     result(null, res);
   });
 };
