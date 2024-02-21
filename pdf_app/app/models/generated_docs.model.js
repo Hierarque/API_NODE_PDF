@@ -6,21 +6,21 @@ const PDF_doc = function(pdf_doc) {
   this.content = pdf_doc.content;
 };
 
-Tutorial.create = (newTutorial, result) => {
-  sql.query("INSERT INTO tutorials SET ?", newTutorial, (err, res) => {
+PDF_doc.create = (newPDF_doc, result) => {
+  sql.query("INSERT INTO generated_docs SET ?", newPDF_doc, (err, res) => {
     if (err) {
       console.log("error: ", err);
       result(err, null);
       return;
     }
 
-    console.log("created tutorial: ", { id: res.insertId, ...newTutorial });
-    result(null, { id: res.insertId, ...newTutorial });
+    console.log("created tutorial: ", { id: res.insertId, ...newPDF_doc });
+    result(null, { id: res.insertId, ...newPDF_doc });
   });
 };
 
-Tutorial.findById = (id, result) => {
-  sql.query(`SELECT * FROM tutorials WHERE id = ${id}`, (err, res) => {
+PDF_doc.findById = (id, result) => {
+  sql.query(`SELECT * FROM generated_docs WHERE id = ${id}`, (err, res) => {
     if (err) {
       console.log("error: ", err);
       result(err, null);
@@ -28,18 +28,18 @@ Tutorial.findById = (id, result) => {
     }
 
     if (res.length) {
-      console.log("found tutorial: ", res[0]);
+      console.log("found document: ", res[0]);
       result(null, res[0]);
       return;
     }
 
-    // not found Tutorial with the id
+    // did not found document with the id
     result({ kind: "not_found" }, null);
   });
 };
 
-Tutorial.getAll = (title, result) => {
-  let query = "SELECT * FROM tutorials";
+PDF_doc.getAll = (title, result) => {
+  let query = "SELECT * FROM generated_docs";
 
   if (title) {
     query += ` WHERE title LIKE '%${title}%'`;
@@ -52,13 +52,13 @@ Tutorial.getAll = (title, result) => {
       return;
     }
 
-    console.log("tutorials: ", res);
+    console.log("documents: ", res);
     result(null, res);
   });
 };
 
-Tutorial.getAllPublished = result => {
-  sql.query("SELECT * FROM tutorials WHERE published=true", (err, res) => {
+PDF_doc.getAllPublished = result => {
+  sql.query("SELECT * FROM generated_docs WHERE published=true", (err, res) => {
     if (err) {
       console.log("error: ", err);
       result(null, err);
@@ -70,7 +70,7 @@ Tutorial.getAllPublished = result => {
   });
 };
 
-Tutorial.updateById = (id, tutorial, result) => {
+PDF_doc.updateById = (id, tutorial, result) => {
   sql.query(
     "UPDATE tutorials SET title = ?, description = ?, published = ? WHERE id = ?",
     [tutorial.title, tutorial.description, tutorial.published, id],
@@ -93,8 +93,8 @@ Tutorial.updateById = (id, tutorial, result) => {
   );
 };
 
-Tutorial.remove = (id, result) => {
-  sql.query("DELETE FROM tutorials WHERE id = ?", id, (err, res) => {
+PDF_doc.remove = (id, result) => {
+  sql.query("DELETE FROM generated_docs WHERE id = ?", id, (err, res) => {
     if (err) {
       console.log("error: ", err);
       result(null, err);
@@ -112,8 +112,8 @@ Tutorial.remove = (id, result) => {
   });
 };
 
-Tutorial.removeAll = result => {
-  sql.query("DELETE FROM tutorials", (err, res) => {
+PDF_doc.removeAll = result => {
+  sql.query("DELETE FROM generated_docs", (err, res) => {
     if (err) {
       console.log("error: ", err);
       result(null, err);
@@ -125,4 +125,4 @@ Tutorial.removeAll = result => {
   });
 };
 
-module.exports = Tutorial;
+module.exports = PDF_doc;
