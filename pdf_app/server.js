@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
+const PDFDocument = require('pdfkit');
 
 const app = express();
 
@@ -20,6 +21,30 @@ app.use(express.urlencoded({ extended: true }));
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to the root of this api." });
 });
+
+// POST endpoint to generate PDF
+app.post('/generate-pdf', (req, res) => {
+  // Extract data from the POST request
+  const { data } = req.body;
+
+  // Create a new PDF document
+  const doc = new PDFDocument();
+
+  // Set response headers
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', 'attachment; filename="generated.pdf"');
+
+  // Pipe PDF output to response
+  doc.pipe(res);
+
+  // Write data to PDF
+  doc.fontSize(16).text('Data received from POST request:', 50, 50);
+  doc.fontSize(12).text(JSON.stringify(data, null, 4), 50, 80);
+
+  // Finalize the PDF
+  doc.end();
+});
+
 
 require("./app/routes/tutorials.routes.js")(app);
 
