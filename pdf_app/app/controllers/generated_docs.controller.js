@@ -1,6 +1,7 @@
 const PDF_document = require("../models/generated_docs.model.js");
 const puppeteer = require('puppeteer');
 const fs = require('fs');
+const ejs = require('ejs')
 const path = require('path');
 
 // Create and Save a new doc
@@ -129,7 +130,7 @@ exports.generate_pdf =(req, res) => {
         const htmlContent = fs.readFileSync(htmlFilePath, 'utf8');
       
         await page.setContent(htmlContent, {
-          waitUntil: 'networkidle0', // Wait for no more than 0 network connections for at least 500 ms
+          waitUntil: 'networkidle0',
         });
       
         await page.pdf({ path: pdfFilePath, format: 'A4' });
@@ -140,6 +141,8 @@ exports.generate_pdf =(req, res) => {
     const pdfFilePath = process.env.PDF_OUTPUT_TEMPLATE_PATH;
 
     generatePDF(htmlFilePath, pdfFilePath)
-    .then(() => console.log('PDF generated successfully'))
+    .then(() => {
+        console.log('PDF generated successfully')
+    })
     .catch(error => console.error('Error generating PDF:', error));
 };
