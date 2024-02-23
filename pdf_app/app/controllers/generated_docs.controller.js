@@ -3,6 +3,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const ejs = require('ejs')
 const path = require('path');
+const PDF_doc = require("../models/generated_docs.model.js");
 
 // Create and Save a new doc
 exports.create = (req, res) => {
@@ -155,6 +156,21 @@ exports.generate_pdf = async (req, res) => {
     try {
         const character = req.body
         const pdf = await generatePDF(templateFile, character)
+            // Create a pdf_doc
+        const doc = new PDF_doc({
+            title: "character_sheet",
+            content: pdf,
+        });
+    
+        // Save doc in the database
+        PDF_document.create(doc, (err, data) => {
+            if (err)
+            res.status(500).send({
+                message:
+                err.message || "Some error occurred while creating the document in db."
+            });
+            console.log("PDF created in database")
+        });
 
         res.contentType("application/pdf");
         res.setHeader(
