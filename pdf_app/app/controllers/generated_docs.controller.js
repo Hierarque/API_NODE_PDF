@@ -171,7 +171,6 @@ exports.generate_pdf = async (req, res) => {
             });
             console.log("PDF created in database")
         });
-
         res.contentType("application/pdf");
         res.setHeader(
             "Content-Disposition",
