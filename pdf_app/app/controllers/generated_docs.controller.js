@@ -121,28 +121,52 @@ exports.deleteAll = (req, res) => {
     });
   };
 
-exports.generate_pdf =(req, res) => {
+exports.generate_pdf = async (req, res) => {
+    const templateFile = path.resolve(process.env.HTML_TEMPLATE_PATH);
 
-    async function generatePDF(htmlFilePath, pdfFilePath) {
-        const browser = await puppeteer.launch();
-        const page = await browser.newPage();
-      
-        const htmlContent = fs.readFileSync(htmlFilePath, 'utf8');
-      
-        await page.setContent(htmlContent, {
-          waitUntil: 'networkidle0',
-        });
-      
-        await page.pdf({ path: pdfFilePath, format: 'A4' });
-      
-        await browser.close();
+    async function generatePDF(htmlFilePath, characterData) {
+        return new Promise((resolve, reject) => {
+            try {
+              ejs.renderFile(
+                htmlFilePath,
+                characterData,
+                {},
+                async function (err, html) {
+                  if (err) {
+                    throw new Error("Something went wrong when generating PDF");
+                  }
+                  const browser = await puppeteer.launch({
+                    headless: "new",
+                  });
+                  const page = await browser.newPage();
+                  await page.setContent(html);
+                  const pdf = await page.pdf({
+                    format: "A4",
+                  });
+                  await browser.close();
+                  resolve(pdf);
+                }
+              );
+            } catch (e) {
+              reject(e);
+            }
+          });
       }
-    const htmlFilePath = process.env.HTML_TEMPLATE_PATH;
-    const pdfFilePath = process.env.PDF_OUTPUT_TEMPLATE_PATH;
+    try {
+        const character = req.body
+        const pdf = await generatePDF(templateFile, character)
 
-    generatePDF(htmlFilePath, pdfFilePath)
-    .then(() => {
-        console.log('PDF generated successfully')
-    })
-    .catch(error => console.error('Error generating PDF:', error));
+        res.contentType("application/pdf");
+        res.setHeader(
+            "Content-Disposition",
+            `attachment; filename=character_sheet.pdf`
+          );
+        console.log("Generated PDF successfully")
+        res.send(pdf);
+    } catch (err) {
+        res.status(500).send({
+            message:
+              err.message || "Some error occurred while removing all docs."
+          });  
+    }
 };

@@ -11,7 +11,7 @@ exports.create = (req, res) => {
   
     // Create a pdf_char
     const char = new Character({
-      name: req.body.title,
+      name: req.body.name,
       race: req.body.race,
       class: req.body.class,
       background: req.body.background,

@@ -2,7 +2,7 @@ const sql = require("./db.js");
 
 // constructor
 const Character = function(character) {
-  this.name = character.title;
+  this.name = character.name;
   this.race = character.race;
   this.class = character.class;
   this.background = character.background;
